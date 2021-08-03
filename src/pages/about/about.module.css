@@ -1,0 +1,19 @@
+.about-section {
+  padding: 50px;
+  text-align: center;
+  background-color: #474e5d;
+  color: white;
+}
+
+.author {
+  text-align: center;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: center;
+}
+
+.link-to-canvas {
+  color: #6e6eed;
+}

@@ -1,12 +1,27 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from "react-router-dom";
 
-import Canvas from './components/Canvas';
+import Main from './pages/main';
+import About from './pages/about';
 
 function App() {
 
   return (
     <div className="App">
-      <Canvas />
+      <Router>
+        <Switch>
+          <Route path="/" exact>
+            <Main />
+          </Route>
+          <Route path="/about">
+            <About />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }

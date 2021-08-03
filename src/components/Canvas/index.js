@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 
-import Point from '../Point';
+import Point from '../../Point';
 
 const Canvas = props => {
   const [clicks, setClicks] = useState(0);
@@ -28,10 +28,10 @@ const Canvas = props => {
   const handleMouseDown = (e) => {
     setClicks((prev) => prev + 1);
     if (!isReadyForCreateFigure) {
-      const point = new Point(e.clientX, e.clientY);
+      const point = new Point(e.clientX, e.nativeEvent.layerY);
+      drawPoint(point);
 
       setPoints([...points, point]);
-      drawPoint(point);
     } else {
       const mouse = onMousePos(e);
       for (let i = 0; i < points.length - 1; i++) {
@@ -46,7 +46,7 @@ const Canvas = props => {
   }
 
   const getFourthPoint = useCallback(() => {
-    if (points.length <= 3) {
+    if (points.length === 3) {
       const point4X = points[2].x - points[1].x + points[0].x;
       const point4Y = points[2].y - points[1].y + points[0].y;
       const centerPoint = new Point(point4X, point4Y);
@@ -75,7 +75,7 @@ const Canvas = props => {
 
 
   const drawParallelogramAndCircle = useCallback(() => {
-    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     context.beginPath();
     context.moveTo(points[0].x, points[0].y);
     for (let i = 1; i < points.length - 1; i++) {
@@ -92,10 +92,11 @@ const Canvas = props => {
 
     context.beginPath();
 
-    context.arc(points[4].x, points[4].y, 30, 0, 2 * Math.PI);
+    context.arc(points[4].x, points[4].y, 11, 0, 2 * Math.PI);
     context.strokeStyle = "green";
+    context.strokeText(`x: ${points[4].x}, y: ${points[4].y}`, points[4].x, points[4].y - 20);
     context.closePath();
-    context.stroke();
+    context.fill();
 
     drawPoints();
   }, [points, context, drawPoints]);
@@ -135,6 +136,18 @@ const Canvas = props => {
     };
   }
 
+  const handleMouseClick = () => {
+    setDragableElem(null);
+  }
+
+  const handleReset = () => {
+    setPoints([]);
+    setClicks(0);
+    setIsReadyForCreatrFigure(false);
+    setDragableElem(null);
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  }
+
   useEffect(() => {
     if (clicks === 3) {
       setIsReadyForCreatrFigure(true)
@@ -164,22 +177,21 @@ const Canvas = props => {
     const context = canvas.getContext('2d')
     setContext(context);
     context.fillStyle = '#fff'
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
+    context.fillRect(0, 0, canvas.width, canvas.height)
   }, [])
 
-  const handleMouseClick = () => {
-    setDragableElem(null);
-  }
-
   return (
-    <canvas
-      ref={canvasRef}
-      {...props}
-      onMouseDown={handleMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
-      onClick={handleMouseClick}
-    />
+    <>
+      {<button onClick={handleReset}>Reset canvas</button>}
+      <canvas
+        ref={canvasRef}
+        {...props}
+        onMouseDown={handleMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseMove={onMouseMove}
+        onClick={handleMouseClick}
+      />
+    </>
   )
 }
 
